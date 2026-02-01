@@ -3,6 +3,7 @@ from apps.v1 import route_login
 from apps.v1 import home
 from fastapi import APIRouter
 
+
 app_router = APIRouter()
 
 app_router.include_router(

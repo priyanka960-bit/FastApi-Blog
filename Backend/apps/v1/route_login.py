@@ -14,11 +14,11 @@ from pydantic.error_wrappers import ValidationError
 templates = Jinja2Templates(directory="templates")
 router = APIRouter()
 
-@router.get("/register")
+@router.get("/signup")
 def register(request: Request):
     return templates.TemplateResponse("auth/register.html",{"request":request})
 
-@router.post("/register")
+@router.post("/signup")
 def register(request: Request, email: str = Form(...), password: str= Form(...), db: Session = Depends(get_db)):
     errors = []
     try:
@@ -49,7 +49,7 @@ def login(request: Request,
         return templates.TemplateResponse("auth/login.html", {"request": request,"errors":errors})
     access_token = create_access_token(data={"sub": email})
     response = responses.RedirectResponse(
-            "/?alert=Successfully Logged In", status_code=status.HTTP_302_FOUND
+            "/blogs?alert=Successfully Logged In", status_code=status.HTTP_302_FOUND
         )
     response.set_cookie(key="access_token",value=f"Bearer {access_token}",httponly=True)
     return response

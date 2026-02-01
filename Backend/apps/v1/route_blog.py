@@ -17,24 +17,17 @@ from db.repository.blog import delete_blog
 templates = Jinja2Templates(directory="templates")
 router = APIRouter()
 
-@router.get("/blogs")
-def blog_list(Request, alert: Optional[str] = None, db: Session = Depends(get_db)):
+@router.get("/")
+def blog_list(request: Request, alert: Optional[str] = None, db: Session = Depends(get_db)):
     blogs = list_all_blogs(db=db)
     return templates.TemplateResponse("blog/home.html", {"request": request, "blogs": blogs, "alert":alert})
 
-@router.get("/app/blog/{id}")
-def blog_detail(request: Request, id: int, db: Session = Depends(get_db)):
-    blog = retrieve_blog(id=id, db=db)
-    return templates.TemplateResponse(
-        "blog/detail.html", {"request": request, "blog": blog}
-    )
-
-@router.get("/app/create-new-blog")
+@router.get("/create-new-blog")
 def create_blog(request: Request):
     return templates.TemplateResponse("blog/create_blog.html",{"request":request})
 
-@router.post("/app/create-new-blog")
-def create_blog(
+@router.post("/create-new-blog")
+def create_blog_post(
     request: Request,
     title: str = Form(...),
     content: str = Form(...),
@@ -47,7 +40,7 @@ def create_blog(
         blog = CreateBlog(title=title, content=content)
         blog = create_new_blog(blog=blog, db=db, author_id=author.id)
         return responses.RedirectResponse(
-            "/?alert=Blog Submitted for Review", status_code=status.HTTP_302_FOUND
+            "/blogs?alert=Blog Submitted for Review", status_code=status.HTTP_302_FOUND
         )
     except Exception as e:
         errors = ["Please log in to create blog"]
@@ -58,18 +51,35 @@ def create_blog(
         )
 
 @router.get("/delete/{id}")
-def delete_a_blog(request: Request,id: int, db:Session = Depends(get_db)):
+def delete_a_blog(request: Request, id: int, db: Session = Depends(get_db)):
     token = request.cookies.get("access_token")
     _, token = get_authorization_scheme_param(token)
+
     try:
         author = get_current_user(token=token, db=db)
-        msg = delete_blog(id=id,author_id=author.id,db=db)
+        msg = delete_blog(id=id, author_id=author.id, db=db)
         alert = msg.get("error") or msg.get("msg")
+        if msg.get("error"):
+            return responses.RedirectResponse(
+                f"/blogs/{id}?alert={alert}",
+                status_code=status.HTTP_302_FOUND,
+            )
+
         return responses.RedirectResponse(
-            f"/?alert={alert}", status_code=status.HTTP_302_FOUND
+            f"/blogs?alert={alert}",
+            status_code=status.HTTP_302_FOUND,
         )
+
     except Exception as e:
         print(f"Exception raised while deleting {e}")
-        blog = retrieve_blog(id=id,db=db)
-        return templates.TemplateResponse("blog/detail.html",{"request":request,"alert":"Please Login Again",
-                                                              "blog":blog})
+        return responses.RedirectResponse(
+            f"/blogs/{id}?alert=Please login again",
+            status_code=status.HTTP_302_FOUND,
+        )
+    
+@router.get("/{id}")
+def blog_detail(request: Request, id: int, alert: Optional[str] = None, db: Session = Depends(get_db)):
+    blog = retrieve_blog(id=id, db=db)
+    return templates.TemplateResponse(
+        "blog/detail.html", {"request": request, "blog": blog, "alert": alert,  }
+    )
