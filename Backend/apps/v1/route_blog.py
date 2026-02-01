@@ -17,8 +17,8 @@ from db.repository.blog import delete_blog
 templates = Jinja2Templates(directory="templates")
 router = APIRouter()
 
-@router.get("/")
-def home(request: Request, alert: Optional[str] = None, db: Session = Depends(get_db)):
+@router.get("/blogs")
+def blog_list(Request, alert: Optional[str] = None, db: Session = Depends(get_db)):
     blogs = list_all_blogs(db=db)
     return templates.TemplateResponse("blog/home.html", {"request": request, "blogs": blogs, "alert":alert})
 

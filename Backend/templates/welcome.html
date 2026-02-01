@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+
+{% block title %}
+<title>Welcome | LikhoYaar</title>
+{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+  <div class="row align-items-center">
+    
+    <!-- LEFT -->
+    <div class="col-md-6">
+      <h1 class="fw-bold">Welcome to LikhoYaar ✍️</h1>
+      <p class="text-muted mt-3">
+        Share your thoughts, read amazing blogs, and grow together.
+      </p>
+
+      <a href="/auth/login" class="btn btn-success me-2">Login</a>
+      <a href="/auth/signup" class="btn btn-outline-success">Sign Up</a>
+    </div>
+
+    <!-- RIGHT -->
+    <div class="col-md-6 text-center">
+      <img
+        src="https://media.giphy.com/media/26tn33aiTi1jkl6H6/giphy.gif"
+        class="img-fluid rounded"
+        alt="Blogging"
+      >
+    </div>
+
+  </div>
+</div>
+{% endblock %}
