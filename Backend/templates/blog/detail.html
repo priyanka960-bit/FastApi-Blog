@@ -8,9 +8,18 @@
 <div class="container">
     <div class="row">
         <h1 class="display-4 text-center">{{blog.title}}</h1>
-        <small class="text-muted">Publish Date: {{blog.created_at.strftime('%Y-%m-%d')}}</small>
+        <div class="mb-3">
+        <span class="fw-semibold fs-5 text-primary">
+            📅 {{ blog.created_at.strftime('%Y-%m-%d') }}
+        </span>
+        <br>
+        <span class="fw-semibold fs-5 text-success">
+            ✍️ {{ blog.author.email.split('@')[0] }}
+        </span>
+        </div>
         <p class="text-secondary my-4">{{blog.content}}</p>
-        <a href="/blogs/delete/{{blog.id}}" class="btn btn-outline-danger col-sm-1 justify-content-center">Delete</a>
+        <a href="/blogs/update/{{blog.id}}" class="btn btn-outline-primary col-sm-1 justify-content-center">Update</a>
+        <a href="/blogs/delete/{{blog.id}}" class="btn btn-outline-danger col-sm-1 justify-content-center"> Delete</a>
     </div>
 </div>
 {% endblock %}

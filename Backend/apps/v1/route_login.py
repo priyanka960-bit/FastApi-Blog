@@ -7,9 +7,11 @@ from sqlalchemy.orm import Session
 from db.session import get_db
 from schemas.users import UserCreate
 from db.repository.user import create_new_user
+from apis.v1.route_login import get_current_user
 from apis.v1.route_login import authenticate_user
 from core.security import create_access_token
 from pydantic.error_wrappers import ValidationError
+from fastapi.security.utils import get_authorization_scheme_param
 
 templates = Jinja2Templates(directory="templates")
 router = APIRouter()
@@ -53,5 +55,30 @@ def login(request: Request,
         )
     response.set_cookie(key="access_token",value=f"Bearer {access_token}",httponly=True)
     return response
+
+@router.get("/logout")
+def logout():
+    response = responses.RedirectResponse(
+        url="/auth/login",
+        status_code=status.HTTP_302_FOUND
+    )
+    response.delete_cookie("access_token")
+    return response
+
+@router.get("/profile")
+def profile(request: Request, db: Session = Depends(get_db)):
+    token = request.cookies.get("access_token")
+    _, token = get_authorization_scheme_param(token)
+
+    user = get_current_user(token=token, db=db)
+
+    return templates.TemplateResponse(
+        "auth/profile.html",
+        {
+            "request": request,
+            "user": user
+        }
+    )
+
 
     

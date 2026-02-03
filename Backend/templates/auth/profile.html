@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+  <h2>My Profile</h2>
+
+  <div class="card p-3 mt-3" style="max-width: 400px;">
+    <p><strong>Email:</strong> {{ user.email }}</p>
+    <p><strong>Role:</strong>
+      {% if user.is_superuser %}
+        Admin
+      {% else %}
+        User
+      {% endif %}
+    </p>
+    <p><strong>Status:</strong>
+      {{ "Active" if user.is_active else "Inactive" }}
+    </p>
+  </div>
+</div>
+{% endblock %}
